@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoBoost: Unit 8 Mastery</title>
+    
+    <!-- React & ReactDOM -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // --- ICONS (Inline SVGs to remove external dependencies) ---
+        const Icon = ({ children, size = 20, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                {children}
+            </svg>
+        );
+
+        const BookOpen = (props) => <Icon {...props}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></Icon>;
+        const CheckCircle = (props) => <Icon {...props}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></Icon>;
+        const XCircle = (props) => <Icon {...props}><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></Icon>;
+        const ArrowRight = (props) => <Icon {...props}><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></Icon>;
+        const Award = (props) => <Icon {...props}><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></Icon>;
+        const Calculator = (props) => <Icon {...props}><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="16" y1="14" x2="16" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></Icon>;
+        const Info = (props) => <Icon {...props}><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></Icon>;
+        const RotateCcw = (props) => <Icon {...props}><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></Icon>;
+        const PenTool = (props) => <Icon {...props}><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></Icon>;
+        const CircleIcon = (props) => <Icon {...props}><circle cx="12" cy="12" r="10"/></Icon>;
+        const TriangleIcon = (props) => <Icon {...props}><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></Icon>;
+        const Divide = (props) => <Icon {...props}><circle cx="12" cy="6" r="1"/><line x1="5" y1="12" x2="19" y2="12"/><circle cx="12" cy="18" r="1"/></Icon>;
+
+        // --- DATA & CURRICULUM CONTENT ---
+
+        const TOPICS = [
+            {
+                id: 'tangents',
+                title: '8-1: Tangent Lines',
+                icon: <PenTool size={20} />,
+                description: 'Lines touching the circle at exactly one point.',
+                theory: (
+                <div className="space-y-4 text-slate-700">
+                    <h3 className="font-bold text-lg text-indigo-700">Key Concepts</h3>
+                    <ul className="list-disc pl-5 space-y-2">
+                    <li>
+                        <strong>Perpendicular Rule:</strong> If a line is tangent to a circle, it forms a <span className="font-bold text-pink-600">90° angle</span> (perpendicular) with the radius at the point of tangency.
+                    </li>
+                    <li>
+                        <strong>Ice Cream Cone Theorem:</strong> If two tangent segments come from the same outside point, they are <span className="font-bold text-pink-600">congruent</span> (equal in length).
+                    </li>
+                    </ul>
+                    <div className="bg-indigo-50 p-4 rounded-lg border border-indigo-200 text-sm">
+                    <p><strong>Tip:</strong> Look for Right Triangles! Since tangents create 90° angles, you can often use the Pythagorean Theorem ($a^2 + b^2 = c^2$) to find missing lengths.</p>
+                    </div>
+                </div>
+                ),
+                questions: [
+                {
+                    id: 1,
+                    question: "Fill in the blank: If a line is tangent to a circle, then the line is ________ to the radius at the point of tangency.",
+                    options: ["parallel", "perpendicular", "congruent", "vertical"],
+                    correctIndex: 1,
+                    explanation: "Imagine a bike wheel on the ground. The spoke (radius) pointing down is perpendicular (90°) to the ground (tangent line)."
+                },
+                {
+                    id: 2,
+                    question: "If two tangent segments to a circle share a common endpoint outside a circle (like an ice cream cone), then the two segments are...",
+                    options: ["congruent", "perpendicular", "parallel", "vertical"],
+                    correctIndex: 0,
+                    explanation: "This is the 'Two-Tangent Theorem'. The segments from the outside point to the circle are equal in length."
+                },
+                {
+                    id: 3,
+                    question: "Refer to the diagram: ML and MN are tangent to circle O. Angle O is 111°. What is the value of x?",
+                    type: "diagram_kite",
+                    angleO: 111,
+                    options: ["41°", "42°", "59°", "69°"],
+                    correctIndex: 3,
+                    explanation: "The angles at L and N are 90° because they are tangents. A quadrilateral adds up to 360°. So, 90 + 90 + 111 + x = 360. Or simpler: x + 111 = 180. x = 69°."
+                },
+                {
+                    id: 4,
+                    question: "A tower is 200 m (0.2 km) high. Earth's radius is 6400 km. About how far is it to the horizon? (Use a² + b² = c²)",
+                    options: ["50.6 km", "400.1 km", "1600 km", "25.3 km"],
+                    correctIndex: 0,
+                    explanation: "Triangle sides: Leg 1 = 6400. Hypotenuse = 6400.2 (Radius + height). Solve: x² + 6400² = 6400.2². x ≈ 50.6 km."
+                }
+                ]
+            },
+            {
+                id: 'chords_angles',
+                title: '8-2 & 8-3: Chords & Inscribed Angles',
+                icon: <CircleIcon size={20} />,
+                description: 'Arcs, chords, and angles inside the circle.',
+                theory: (
+                <div className="space-y-4 text-slate-700">
+                    <h3 className="font-bold text-lg text-indigo-700">The Rules of the Ring</h3>
+                    <div className="grid gap-4">
+                    <div className="bg-white p-3 border rounded shadow-sm">
+                        <h4 className="font-bold text-slate-800">Inscribed Angles</h4>
+                        <p className="text-sm mb-2">An angle with its vertex <em>on</em> the rim of the circle is <strong>half</strong> the measure of the arc it eats.</p>
+                        <div className="bg-slate-100 p-2 rounded text-center font-mono text-sm">Angle = Arc / 2</div>
+                    </div>
+                    <div className="bg-white p-3 border rounded shadow-sm">
+                        <h4 className="font-bold text-slate-800">Inscribed Quadrilaterals</h4>
+                        <p className="text-sm">If a 4-sided shape is inside a circle, <strong>opposite angles add to 180°</strong>.</p>
+                    </div>
+                    <div className="bg-white p-3 border rounded shadow-sm">
+                        <h4 className="font-bold text-slate-800">Chords</h4>
+                        <p className="text-sm">If a radius is perpendicular to a chord, it <strong>bisects</strong> the chord (cuts it in half) and its arc.</p>
+                    </div>
+                    </div>
+                </div>
+                ),
+                questions: [
+                {
+                    id: 10,
+                    question: "An inscribed angle ABC intercepts arc AC. If arc AC is 100°, what is the measure of angle ABC?",
+                    options: ["50°", "100°", "200°", "25°"],
+                    correctIndex: 0,
+                    explanation: "Inscribed Angle Rule: The angle is half the arc. 100 / 2 = 50°."
+                },
+                {
+                    id: 11,
+                    question: "A quadrilateral is inscribed in a circle. Angle A is 80°. What is the measure of the opposite angle C?",
+                    options: ["80°", "100°", "90°", "10°"],
+                    correctIndex: 1,
+                    explanation: "Inscribed Quadrilateral Rule: Opposite angles are supplementary (add to 180). 180 - 80 = 100°."
+                },
+                {
+                    id: 12,
+                    question: "In circle O, a radius is perpendicular to a chord of length 16. What is the length of one of the segments created by the intersection?",
+                    options: ["4", "8", "16", "32"],
+                    correctIndex: 1,
+                    explanation: "Perpendicular Bisector Rule: If the radius hits the chord at 90°, it cuts it in half. 16 / 2 = 8."
+                }
+                ]
+            },
+            {
+                id: 'angle_measures',
+                title: '8-4: Angle Measures',
+                icon: <TriangleIcon size={20} />,
+                description: 'Angles formed by secants and chords inside/outside.',
+                theory: (
+                <div className="space-y-4 text-slate-700">
+                    <h3 className="font-bold text-lg text-indigo-700">Where is the Vertex?</h3>
+                    <ul className="list-disc pl-5 space-y-3">
+                    <li>
+                        <strong>Vertex INSIDE the Circle:</strong> The angle is the <em>average</em> of the two arcs.
+                        <div className="mt-1 font-mono bg-blue-50 p-1 rounded inline-block">Angle = (Arc1 + Arc2) / 2</div>
+                    </li>
+                    <li>
+                        <strong>Vertex OUTSIDE the Circle:</strong> The angle is half the <em>difference</em> of the arcs.
+                        <div className="mt-1 font-mono bg-orange-50 p-1 rounded inline-block">Angle = (Big Arc - Little Arc) / 2</div>
+                    </li>
+                    </ul>
+                    <div className="bg-yellow-50 p-3 rounded border border-yellow-200 text-sm mt-2">
+                    <strong>Memory Aid:</strong> <br/>Inside = Add (+)<br/>Outside = Subtract (-)
+                    </div>
+                </div>
+                ),
+                questions: [
+                {
+                    id: 15,
+                    question: "Two chords intersect INSIDE a circle. They intercept arcs of 40° and 80°. What is the measure of the angle formed?",
+                    options: ["20°", "40°", "60°", "120°"],
+                    correctIndex: 2,
+                    explanation: "Vertex Inside = Add and Divide by 2. (40 + 80) / 2 = 120 / 2 = 60°."
+                },
+                {
+                    id: 16,
+                    question: "Two secants intersect OUTSIDE a circle. They intercept a big arc of 100° and a small arc of 20°. Find the angle.",
+                    options: ["40°", "60°", "80°", "120°"],
+                    correctIndex: 0,
+                    explanation: "Vertex Outside = Subtract and Divide by 2. (100 - 20) / 2 = 80 / 2 = 40°."
+                }
+                ]
+            },
+            {
+                id: 'segment_lengths',
+                title: '8-4: Segment Lengths',
+                icon: <Divide size={20} />,
+                description: 'Finding missing lengths of chords and secants.',
+                theory: (
+                <div className="space-y-4 text-slate-700">
+                    <h3 className="font-bold text-lg text-indigo-700">Piece × Piece</h3>
+                    <ul className="list-disc pl-5 space-y-4">
+                    <li>
+                        <strong>Intersecting Chords (The X):</strong>
+                        <br />
+                        PieceA × PieceB = PieceC × PieceD
+                    </li>
+                    <li>
+                        <strong>Secants (The V):</strong>
+                        <br />
+                        Whole × Outside = Whole × Outside
+                        <div className="text-xs text-red-500 mt-1 font-bold">CRITICAL: "Whole" means the entire length (outside part + inside part).</div>
+                    </li>
+                    </ul>
+                </div>
+                ),
+                questions: [
+                {
+                    id: 20,
+                    question: "Two chords intersect in a circle. One chord has segments of lengths 3 and 8. The other has segments x and 4. Find x.",
+                    options: ["5", "6", "12", "24"],
+                    correctIndex: 1,
+                    explanation: "Chord Rule: Part * Part = Part * Part. 3 * 8 = 4 * x. 24 = 4x. x = 6."
+                },
+                {
+                    id: 21,
+                    question: "Two secants meet outside. Secant 1 has an outside part of 4 and an inside part of 6 (Total = 10). Secant 2 has an outside part of 5. Find the total length of Secant 2.",
+                    options: ["8", "12", "10", "4.8"],
+                    correctIndex: 0,
+                    explanation: "Secant Rule: Whole * Outside = Whole * Outside. First secant: 10 * 4 = 40. Second secant: x * 5 = 40. x = 8."
+                }
+                ]
+            },
+            {
+                id: 'equations',
+                title: '8-5: Circles in Coordinate Plane',
+                icon: <Calculator size={20} />,
+                description: 'Graphing circles and writing their equations.',
+                theory: (
+                <div className="space-y-4 text-slate-700">
+                    <h3 className="font-bold text-lg text-indigo-700">The Golden Formula</h3>
+                    <p className="text-xl text-center bg-slate-100 p-3 rounded-lg font-mono">
+                    (x - <span className="text-red-500">h</span>)² + (y - <span className="text-blue-500">k</span>)² = <span className="text-green-600">r</span>²
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="bg-white p-3 border rounded shadow-sm">
+                        <h4 className="font-bold text-slate-800">Center (h, k)</h4>
+                        <p className="text-sm">Careful with signs! If the equation says <code className="bg-gray-100 px-1">(x-4)</code>, the x-coordinate is positive 4. If it says <code className="bg-gray-100 px-1">(y+9)</code>, the y-coordinate is negative 9.</p>
+                    </div>
+                    <div className="bg-white p-3 border rounded shadow-sm">
+                        <h4 className="font-bold text-slate-800">Radius (r)</h4>
+                        <p className="text-sm">The equation equals radius <strong>squared</strong>. If the equation equals 25, the radius is 5.</p>
+                    </div>
+                    </div>
+                </div>
+                ),
+                questions: [
+                {
+                    id: 26,
+                    question: "What is the standard equation for a circle with center (-4, 9) and radius 1?",
+                    options: [
+                    "(x - 4)² + (y + 9)² = 1",
+                    "(x - 4)² + (y - 9)² = 1",
+                    "(x + 4)² + (y + 9)² = 1",
+                    "(x + 4)² + (y - 9)² = 1"
+                    ],
+                    correctIndex: 3,
+                    explanation: "Flip the signs of the center! -4 becomes (x + 4) and positive 9 becomes (y - 9). Radius squared is 1² = 1."
+                },
+                {
+                    id: 27,
+                    question: "Identify the correct equation for a circle with center (-2, 2) and r² = 128.",
+                    options: [
+                    "(x - 2)² + (y - 2)² = 128",
+                    "(x - 2)² + (y + 2)² = 128",
+                    "(x + 2)² + (y + 2)² = 128",
+                    "(x + 2)² + (y - 2)² = 128"
+                    ],
+                    correctIndex: 3,
+                    explanation: "Center x is -2, so we need (x + 2). Center y is 2, so we need (y - 2)."
+                },
+                {
+                    id: 28,
+                    question: "True or False: The point (0, 0) is on the circle (x-3)² + (y-4)² = 25.",
+                    options: ["True", "False"],
+                    correctIndex: 0,
+                    explanation: "Plug in 0 for x and y. (-3)² + (-4)² = 9 + 16 = 25. Since 25 = 25, it is true."
+                }
+                ]
+            }
+        ];
+
+        // --- SUB-COMPONENTS ---
+
+        const DiagramKite = ({ angleO, highlight }) => (
+            <svg viewBox="0 0 200 160" className="w-64 h-52 mx-auto my-4 bg-white rounded-lg shadow-inner">
+                {/* Circle */}
+                <circle cx="60" cy="80" r="40" stroke="#4f46e5" strokeWidth="2" fill="none" opacity="0.3" />
+                <circle cx="60" cy="80" r="3" fill="#4f46e5" />
+                <text x="50" y="85" fontSize="12" fill="#4f46e5">O</text>
+
+                {/* Tangent Points */}
+                <circle cx="75" cy="43" r="3" fill={highlight ? "#db2777" : "#333"} /> {/* L */}
+                <text x="75" y="35" fontSize="12">L</text>
+                
+                <circle cx="75" cy="117" r="3" fill={highlight ? "#db2777" : "#333"} /> {/* N */}
+                <text x="75" y="135" fontSize="12">N</text>
+
+                {/* Outside Point */}
+                <circle cx="160" cy="80" r="3" fill="#333" /> {/* M */}
+                <text x="170" y="85" fontSize="12">M</text>
+
+                {/* Lines */}
+                <line x1="60" y1="80" x2="75" y2="43" stroke="#4f46e5" strokeWidth="2" /> {/* Radius */}
+                <line x1="60" y1="80" x2="75" y2="117" stroke="#4f46e5" strokeWidth="2" /> {/* Radius */}
+                
+                <line x1="75" y1="43" x2="160" y2="80" stroke="#333" strokeWidth="2" /> {/* Tangent */}
+                <line x1="75" y1="117" x2="160" y2="80" stroke="#333" strokeWidth="2" /> {/* Tangent */}
+
+                {/* Angle O */}
+                <text x="35" y="85" fontSize="12" fontWeight="bold">{angleO}°</text>
+
+                {/* Angle x */}
+                <text x="135" y="85" fontSize="14" fontWeight="bold" fill="#db2777">x°</text>
+            </svg>
+        );
+
+        const ProgressBar = ({ current, total }) => {
+            const width = `${(current / total) * 100}%`;
+            return (
+                <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden mt-2">
+                    <div className="bg-indigo-600 h-full transition-all duration-500" style={{ width }}></div>
+                </div>
+            );
+        };
+
+        // --- MAIN APP COMPONENT ---
+
+        function Unit8Prep() {
+            const [view, setView] = useState('home'); // home, learn, practice
+            const [activeTopicId, setActiveTopicId] = useState(null);
+            const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0);
+            const [selectedAnswer, setSelectedAnswer] = useState(null);
+            const [isCorrect, setIsCorrect] = useState(null);
+            const [showExplanation, setShowExplanation] = useState(false);
+            const [score, setScore] = useState(0);
+            const [streak, setStreak] = useState(0);
+
+            const activeTopic = TOPICS.find(t => t.id === activeTopicId);
+
+            // Reset question state when topic changes or question advances
+            useEffect(() => {
+                setSelectedAnswer(null);
+                setIsCorrect(null);
+                setShowExplanation(false);
+            }, [currentQuestionIdx, activeTopicId]);
+
+            const handleTopicSelect = (topicId, mode) => {
+                setActiveTopicId(topicId);
+                setCurrentQuestionIdx(0);
+                setScore(0);
+                setStreak(0);
+                setView(mode);
+            };
+
+            const handleAnswerClick = (index) => {
+                if (selectedAnswer !== null) return; // Prevent multiple guesses
+
+                setSelectedAnswer(index);
+                const correct = index === activeTopic.questions[currentQuestionIdx].correctIndex;
+                setIsCorrect(correct);
+                setShowExplanation(true);
+
+                if (correct) {
+                    setScore(score + 10 + (streak * 2));
+                    setStreak(streak + 1);
+                } else {
+                    setStreak(0);
+                }
+            };
+
+            const handleNext = () => {
+                if (currentQuestionIdx < activeTopic.questions.length - 1) {
+                    setCurrentQuestionIdx(currentQuestionIdx + 1);
+                } else {
+                    setView('results');
+                }
+            };
+
+            // --- VIEWS ---
+
+            const renderHome = () => (
+                <div className="max-w-3xl mx-auto p-6">
+                    <div className="text-center mb-10">
+                    <h1 className="text-4xl font-extrabold text-indigo-900 mb-2">Geometry Unit 8 Prep</h1>
+                    <p className="text-slate-600">Circles, Tangents, Angles, and Segments. Let's master the full test.</p>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-6">
+                    {TOPICS.map((topic) => (
+                        <div key={topic.id} className="bg-white rounded-xl shadow-md border border-slate-100 p-6 hover:shadow-lg transition-shadow">
+                        <div className="flex items-center gap-3 mb-3 text-indigo-600">
+                            {topic.icon}
+                            <h2 className="font-bold text-lg">{topic.title}</h2>
+                        </div>
+                        <p className="text-sm text-slate-500 mb-6">{topic.description}</p>
+                        <div className="flex gap-2">
+                            <button 
+                            onClick={() => handleTopicSelect(topic.id, 'learn')}
+                            className="flex-1 bg-indigo-50 text-indigo-700 py-2 rounded-lg font-medium hover:bg-indigo-100 transition-colors"
+                            >
+                            Learn First
+                            </button>
+                            <button 
+                            onClick={() => handleTopicSelect(topic.id, 'practice')}
+                            className="flex-1 bg-indigo-600 text-white py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors"
+                            >
+                            Quiz Mode
+                            </button>
+                        </div>
+                        </div>
+                    ))}
+                    </div>
+                </div>
+            );
+
+            const renderLearn = () => (
+                <div className="max-w-2xl mx-auto p-6">
+                    <button onClick={() => setView('home')} className="flex items-center text-slate-500 hover:text-slate-800 mb-6">
+                    <RotateCcw size={16} className="mr-2" /> Back to Menu
+                    </button>
+
+                    <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+                    <div className="bg-indigo-600 p-6 text-white">
+                        <h2 className="text-2xl font-bold flex items-center gap-3">
+                        <BookOpen size={24} />
+                        {activeTopic.title}
+                        </h2>
+                    </div>
+                    
+                    <div className="p-8">
+                        {activeTopic.theory}
+
+                        <div className="mt-8 flex justify-end">
+                        <button 
+                            onClick={() => setView('practice')}
+                            className="flex items-center bg-green-600 text-white px-6 py-3 rounded-full font-bold hover:bg-green-700 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all"
+                        >
+                            I'm Ready to Quiz <ArrowRight size={20} className="ml-2" />
+                        </button>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            );
+
+            const renderPractice = () => {
+                const question = activeTopic.questions[currentQuestionIdx];
+
+                return (
+                    <div className="max-w-2xl mx-auto p-4 md:p-6">
+                    {/* Header */}
+                    <div className="flex justify-between items-center mb-6">
+                        <button onClick={() => setView('home')} className="text-slate-400 hover:text-slate-600">
+                        <XCircle size={24} />
+                        </button>
+                        <div className="flex items-center gap-4">
+                        <div className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-sm font-bold">
+                            Streak: {streak} 🔥
+                        </div>
+                        <div className="text-slate-600 font-medium">
+                            Score: {score}
+                        </div>
+                        </div>
+                    </div>
+
+                    {/* Progress */}
+                    <div className="mb-6">
+                        <div className="flex justify-between text-xs text-slate-400 uppercase tracking-wider mb-1">
+                        <span>Question {currentQuestionIdx + 1} of {activeTopic.questions.length}</span>
+                        <span>{activeTopic.title}</span>
+                        </div>
+                        <ProgressBar current={currentQuestionIdx + 1} total={activeTopic.questions.length} />
+                    </div>
+
+                    {/* Question Card */}
+                    <div className="bg-white rounded-2xl shadow-lg border border-slate-100 overflow-hidden relative">
+                        <div className="p-6 md:p-8">
+                        <h3 className="text-lg md:text-xl font-medium text-slate-800 mb-6 leading-relaxed">
+                            {question.question}
+                        </h3>
+
+                        {question.type === 'diagram_kite' && (
+                            <DiagramKite angleO={question.angleO} highlight={showExplanation} />
+                        )}
+
+                        <div className="space-y-3">
+                            {question.options.map((option, idx) => {
+                            let btnClass = "w-full text-left p-4 rounded-xl border-2 transition-all duration-200 flex justify-between items-center group ";
+                            
+                            if (selectedAnswer === null) {
+                                btnClass += "border-slate-100 hover:border-indigo-300 hover:bg-indigo-50 cursor-pointer";
+                            } else if (idx === question.correctIndex) {
+                                btnClass += "border-green-500 bg-green-50 text-green-800";
+                            } else if (selectedAnswer === idx) {
+                                btnClass += "border-red-400 bg-red-50 text-red-800";
+                            } else {
+                                btnClass += "border-slate-100 opacity-50";
+                            }
+
+                            return (
+                                <button
+                                key={idx}
+                                onClick={() => handleAnswerClick(idx)}
+                                disabled={selectedAnswer !== null}
+                                className={btnClass}
+                                >
+                                <span className="font-medium">{option}</span>
+                                {selectedAnswer !== null && idx === question.correctIndex && <CheckCircle size={20} className="text-green-600" />}
+                                {selectedAnswer === idx && idx !== question.correctIndex && <XCircle size={20} className="text-red-500" />}
+                                </button>
+                            );
+                            })}
+                        </div>
+                        </div>
+
+                        {/* Feedback Section */}
+                        {showExplanation && (
+                        <div className={`p-6 border-t ${isCorrect ? 'bg-green-50 border-green-100' : 'bg-orange-50 border-orange-100'}`}>
+                            <div className="flex gap-3 mb-2">
+                            {isCorrect ? (
+                                <div className="p-2 bg-green-100 rounded-full h-fit text-green-600"><CheckCircle size={24} /></div>
+                            ) : (
+                                <div className="p-2 bg-orange-100 rounded-full h-fit text-orange-600"><Info size={24} /></div>
+                            )}
+                            <div>
+                                <h4 className={`font-bold ${isCorrect ? 'text-green-800' : 'text-orange-800'}`}>
+                                {isCorrect ? 'Correct!' : 'Not quite right'}
+                                </h4>
+                                <p className="text-slate-700 text-sm mt-1 leading-relaxed">{question.explanation}</p>
+                            </div>
+                            </div>
+                            <div className="flex justify-end mt-4">
+                            <button 
+                                onClick={handleNext}
+                                className="bg-indigo-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-indigo-700 transition-colors flex items-center"
+                            >
+                                {currentQuestionIdx < activeTopic.questions.length - 1 ? 'Next Question' : 'Finish Quiz'}
+                                <ArrowRight size={18} className="ml-2" />
+                            </button>
+                            </div>
+                        </div>
+                        )}
+                    </div>
+                    </div>
+                );
+            };
+
+            const renderResults = () => (
+                <div className="max-w-md mx-auto p-8 text-center mt-10">
+                    <div className="mb-6 inline-block p-6 rounded-full bg-yellow-100 text-yellow-600 shadow-inner">
+                    <Award size={64} />
+                    </div>
+                    <h2 className="text-3xl font-bold text-slate-800 mb-2">Topic Complete!</h2>
+                    <p className="text-slate-500 mb-8">You scored {score} points on {activeTopic.title}.</p>
+                    
+                    <div className="space-y-3">
+                    <button 
+                        onClick={() => {
+                        setCurrentQuestionIdx(0);
+                        setScore(0);
+                        setStreak(0);
+                        setView('practice');
+                        }}
+                        className="w-full bg-indigo-600 text-white py-3 rounded-xl font-bold hover:bg-indigo-700 transition-colors"
+                    >
+                        Try Again
+                    </button>
+                    <button 
+                        onClick={() => setView('home')}
+                        className="w-full bg-white text-slate-600 border border-slate-200 py-3 rounded-xl font-bold hover:bg-slate-50 transition-colors"
+                    >
+                        Choose Different Topic
+                    </button>
+                    </div>
+                </div>
+            );
+
+            return (
+                <div className="min-h-screen bg-slate-50 font-sans text-slate-900">
+                    {view === 'home' && renderHome()}
+                    {view === 'learn' && renderLearn()}
+                    {view === 'practice' && renderPractice()}
+                    {view === 'results' && renderResults()}
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<Unit8Prep />);
+    </script>
+</body>
+</html>
