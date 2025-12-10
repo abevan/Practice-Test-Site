@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GeoBoost: Unit 7 Mastery</title>
+    <title>Math Readiness: Integer Mastery</title>
     
     <!-- React & ReactDOM -->
     <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
@@ -20,6 +20,7 @@
 
     <style>
         body { font-family: 'Inter', sans-serif; }
+        .number-line-mark { transition: all 0.3s ease; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
@@ -35,169 +36,224 @@
             </svg>
         );
 
-        const MapPin = (props) => <Icon {...props}><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></Icon>;
-        const GitCommit = (props) => <Icon {...props}><circle cx="12" cy="12" r="4"></circle><line x1="1.05" y1="12" x2="7" y2="12"></line><line x1="17.01" y1="12" x2="22.96" y2="12"></line></Icon>;
+        const Plus = (props) => <Icon {...props}><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></Icon>;
+        const Minus = (props) => <Icon {...props}><line x1="5" y1="12" x2="19" y2="12"></line></Icon>;
+        const X = (props) => <Icon {...props}><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></Icon>;
+        const Divide = (props) => <Icon {...props}><circle cx="12" cy="6" r="1"></circle><line x1="5" y1="12" x2="19" y2="12"></line><circle cx="12" cy="18" r="1"></circle></Icon>;
         const CheckCircle = (props) => <Icon {...props}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></Icon>;
         const XCircle = (props) => <Icon {...props}><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></Icon>;
         const ArrowRight = (props) => <Icon {...props}><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></Icon>;
         const Award = (props) => <Icon {...props}><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></Icon>;
-        const Hash = (props) => <Icon {...props}><line x1="4" y1="9" x2="20" y2="9"></line><line x1="4" y1="15" x2="20" y2="15"></line><line x1="10" y1="3" x2="8" y2="21"></line><line x1="16" y1="3" x2="14" y2="21"></line></Icon>;
         const Info = (props) => <Icon {...props}><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></Icon>;
         const RotateCcw = (props) => <Icon {...props}><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></Icon>;
         const BookOpen = (props) => <Icon {...props}><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></Icon>;
-        const Grid = (props) => <Icon {...props}><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></Icon>;
+        const TrendingDown = (props) => <Icon {...props}><polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline><polyline points="17 18 23 18 23 12"></polyline></Icon>;
 
         // --- DATA & CURRICULUM CONTENT ---
 
         const TOPICS = [
             {
-                id: 'midpoint_distance',
-                title: '7-1: Midpoint & Distance',
-                icon: <MapPin size={20} />,
-                description: 'Finding the middle and length of segments.',
+                id: 'addition',
+                title: 'Adding Integers',
+                icon: <Plus size={20} />,
+                description: 'Rules for adding negative and positive numbers.',
                 theory: (
                 <div className="space-y-4 text-slate-700">
-                    <h3 className="font-bold text-lg text-indigo-700">The Core Formulas</h3>
+                    <h3 className="font-bold text-lg text-indigo-700">The Rules of Addition</h3>
                     <div className="grid gap-4">
-                        <div className="bg-white p-3 border rounded shadow-sm">
-                            <h4 className="font-bold text-slate-800">1. Midpoint (The Average)</h4>
-                            <p className="text-sm mb-2">To find the middle, just average the coordinates.</p>
-                            <div className="bg-slate-100 p-2 rounded text-center font-mono text-sm">
-                                M = ( <span className="text-blue-600">x₁+x₂</span> / 2 , <span className="text-green-600">y₁+y₂</span> / 2 )
+                        <div className="bg-blue-50 p-3 rounded border border-blue-200">
+                            <h4 className="font-bold text-blue-800">1. Same Signs? (Add & Keep)</h4>
+                            <p className="text-sm">If the signs are the same, just add the numbers and keep the sign.</p>
+                            <div className="mt-2 font-mono text-sm bg-white p-2 rounded">
+                                -5 + -3 = -8 <br/>
+                                <span className="text-slate-400 text-xs">(Both negative? Answer is negative.)</span>
                             </div>
                         </div>
-                        <div className="bg-white p-3 border rounded shadow-sm">
-                            <h4 className="font-bold text-slate-800">2. Distance (Pythagorean)</h4>
-                            <p className="text-sm mb-2">Distance is just the hypotenuse of a right triangle.</p>
-                            <div className="bg-slate-100 p-2 rounded text-center font-mono text-sm">
-                                d = √[ (x₂-x₁)² + (y₂-y₁)² ]
+                        <div className="bg-purple-50 p-3 rounded border border-purple-200">
+                            <h4 className="font-bold text-purple-800">2. Different Signs? (Subtract)</h4>
+                            <p className="text-sm">If signs are different, ignore the signs, subtract the smaller from the larger, and keep the sign of the "heavier" number.</p>
+                            <div className="mt-2 font-mono text-sm bg-white p-2 rounded">
+                                -10 + 4 = -6 <br/>
+                                <span className="text-slate-400 text-xs">(10 is bigger than 4, so answer is negative.)</span>
                             </div>
                         </div>
-                    </div>
-                    <div className="bg-indigo-50 p-4 rounded-lg border border-indigo-200 text-sm">
-                        <p><strong>Tip:</strong> Be careful with negatives! <br/> (4 - -1) becomes (4 + 1).</p>
                     </div>
                 </div>
                 ),
                 questions: [
                     {
                         id: 1,
-                        question: "Which formula is the Distance Formula?",
+                        question: "Add: (-42) + -15",
                         options: [
-                            "(a+b)/2",
-                            "√(x₂-x₁)² + (y₂-y₁)²",
-                            "(x₁+x₂)/2, (y₁+y₂)/2",
-                            "y = mx + b"
+                            "-27",
+                            "57",
+                            "-57",
+                            "-30"
                         ],
-                        correctIndex: 1,
-                        explanation: "The Distance Formula comes from the Pythagorean Theorem (a² + b² = c²). It uses the square root of the differences squared."
+                        correctIndex: 2,
+                        explanation: "Both numbers are negative (Same Signs). We ADD the numbers (42 + 15 = 57) and KEEP the negative sign. Answer is -57."
                     },
                     {
                         id: 2,
-                        question: "Segment AB has endpoints at -7 and 5 on a number line. What is the coordinate of its midpoint?",
-                        options: ["0", "-1", "1", "2"],
+                        question: "Add: -6 + -6",
+                        options: ["0", "-12", "12", "36"],
                         correctIndex: 1,
-                        explanation: "Average them! (-7 + 5) / 2 = -2 / 2 = -1."
+                        explanation: "Same signs add! 6 + 6 = 12. Since they are both negative, the answer is -12."
                     },
                     {
                         id: 3,
-                        question: "Find the midpoint of segment EF with endpoints E(10, -2) and F(2, -4).",
-                        options: ["(5, 2)", "(6, -3)", "(6, 3)", "(5, -2)"],
+                        question: "Solve: [-4 + (-2)] + [-5 + (-5)]",
+                        options: ["-6", "-16", "16", "-10"],
                         correctIndex: 1,
-                        explanation: "Average the x's: (10+2)/2 = 6. Average the y's: (-2 + -4)/2 = -3. Midpoint is (6, -3)."
+                        explanation: "Do the brackets first. [-4 + -2] = -6. And [-5 + -5] = -10. Now add the results: -6 + -10 = -16."
                     },
                     {
                         id: 4,
-                        question: "What is the distance between U(-1, 9) and V(4, 7)?",
-                        options: ["√25", "√29", "√5", "7"],
-                        correctIndex: 1,
-                        explanation: "Change in x: 4 - (-1) = 5. Change in y: 7 - 9 = -2. Distance = √(5² + (-2)²) = √(25 + 4) = √29."
+                        question: "Add: -100 + 1",
+                        options: ["-101", "99", "-99", "101"],
+                        correctIndex: 2,
+                        explanation: "Different signs! Subtract 100 - 1 = 99. The larger number (100) is negative, so the answer is -99."
                     }
                 ]
             },
             {
-                id: 'polygons',
-                title: '7-2: Polygons in Coordinate Plane',
-                icon: <Grid size={20} />,
-                description: 'Classifying shapes using math.',
+                id: 'subtraction',
+                title: 'Subtracting Integers',
+                icon: <Minus size={20} />,
+                description: 'Keep-Change-Change strategy.',
                 theory: (
                 <div className="space-y-4 text-slate-700">
-                    <h3 className="font-bold text-lg text-indigo-700">Proof by Numbers</h3>
-                    <p>We can identify shapes by calculating their side lengths (distance) and corner angles (slopes).</p>
-                    <ul className="list-disc pl-5 space-y-2">
-                        <li><strong>Isosceles Triangle:</strong> Use distance formula. If 2 sides are equal length, it's Isosceles.</li>
-                        <li><strong>Right Triangle:</strong> Check slopes. If two sides are perpendicular (negative reciprocals), it's a Right triangle.</li>
-                        <li><strong>Parallelogram:</strong> Opposite sides must have the same slope (parallel).</li>
-                    </ul>
-                </div>
-                ),
-                questions: [
-                    {
-                        id: 5,
-                        question: "A triangle has vertices A(0,0), B(4,0), and C(2,4). Use distance formula to classify it.",
-                        options: ["Scalene", "Isosceles", "Equilateral", "Right"],
-                        correctIndex: 1,
-                        explanation: "Distance AB = 4. Distance AC = √(2² + 4²) = √20. Distance BC = √(2² + 4²) = √20. Since AC = BC, it is Isosceles."
-                    },
-                    {
-                        id: 6,
-                        question: "Rectangle ABCD has points A(0,0), B(0,3), C(4,3). What must be the coordinates of D?",
-                        options: ["(4, 0)", "(3, 4)", "(4, 4)", "(3, 0)"],
-                        correctIndex: 0,
-                        explanation: "To make a rectangle, D needs to be directly below C (x=4) and directly across from A (y=0). So D is (4,0)."
-                    }
-                ]
-            },
-            {
-                id: 'slopes',
-                title: '7-3: Parallel & Perpendicular',
-                icon: <GitCommit size={20} />,
-                description: 'Slopes of lines that never meet or meet at 90°.',
-                theory: (
-                <div className="space-y-4 text-slate-700">
-                    <h3 className="font-bold text-lg text-indigo-700">Slope Rules</h3>
-                    <div className="grid gap-4">
-                        <div className="bg-blue-50 p-3 rounded border border-blue-200">
-                            <h4 className="font-bold text-blue-800">Parallel Lines ( || )</h4>
-                            <p className="text-sm">They have the <strong>SAME</strong> slope.</p>
-                            <p className="font-mono text-xs mt-1">m₁ = 2, m₂ = 2</p>
-                        </div>
-                        <div className="bg-pink-50 p-3 rounded border border-pink-200">
-                            <h4 className="font-bold text-pink-800">Perpendicular Lines ( ⊥ )</h4>
-                            <p className="text-sm">Slopes are <strong>Negative Reciprocals</strong> (Flip & Switch Sign).</p>
-                            <p className="font-mono text-xs mt-1">m₁ = 2, m₂ = -1/2</p>
+                    <h3 className="font-bold text-lg text-indigo-700">Keep - Change - Change</h3>
+                    <p>Subtraction is actually just adding the opposite. We never really subtract integers!</p>
+                    <div className="bg-orange-50 p-4 rounded-lg border border-orange-200 text-sm">
+                        <strong className="block mb-2 text-orange-800">The KCC Method:</strong>
+                        <ol className="list-decimal pl-5 space-y-1">
+                            <li><strong>KEEP</strong> the first number exactly the same.</li>
+                            <li><strong>CHANGE</strong> the minus sign to a plus sign.</li>
+                            <li><strong>CHANGE</strong> the sign of the second number (flip it).</li>
+                        </ol>
+                        <div className="mt-3 font-mono bg-white p-2 rounded">
+                            Ex: 5 - (-3)<br/>
+                            1. Keep 5<br/>
+                            2. Change - to +<br/>
+                            3. Change (-3) to 3<br/>
+                            Result: 5 + 3 = 8
                         </div>
                     </div>
                 </div>
                 ),
                 questions: [
                     {
-                        id: 11,
-                        question: "Identify the equation of the line shown in a graph with y-intercept +3 and a slope of -2.",
-                        options: ["y = -3x + 3", "y = -2x + 3", "y = 2x + 4", "y = 3x - 2"],
+                        id: 5,
+                        question: "Subtract: -15 - (-5)",
+                        options: ["-20", "-10", "10", "20"],
                         correctIndex: 1,
-                        explanation: "Slope-intercept form is y = mx + b. m = -2, b = 3. So, y = -2x + 3."
+                        explanation: "Use KCC: Keep -15. Change minus to plus. Change -5 to 5. New problem: -15 + 5. Different signs, so subtract (15-5=10) and keep sign of larger (-). Answer: -10."
+                    },
+                    {
+                        id: 6,
+                        question: "Subtract: 8 - 12",
+                        options: ["4", "-4", "-20", "20"],
+                        correctIndex: 1,
+                        explanation: "KCC: Keep 8. Change to +. Change 12 to -12. Problem: 8 + (-12). Subtract 12 - 8 = 4. 12 is negative, so -4."
+                    }
+                ]
+            },
+            {
+                id: 'mult_div',
+                title: 'Mult & Divide',
+                icon: <X size={20} />,
+                description: 'Tic-Tac-Toe sign rules.',
+                theory: (
+                <div className="space-y-4 text-slate-700">
+                    <h3 className="font-bold text-lg text-indigo-700">The Sign Rules</h3>
+                    <p>Multiplication and Division follow the exact same rules for signs.</p>
+                    <div className="grid grid-cols-2 gap-4 text-center">
+                        <div className="bg-green-50 p-3 rounded border border-green-200">
+                            <div className="text-2xl mb-1">😃 + 😃</div>
+                            <div className="font-bold text-green-800">Same Signs</div>
+                            <div className="text-sm">Answer is POSITIVE</div>
+                            <div className="font-mono text-xs mt-1">-5 × -5 = 25</div>
+                        </div>
+                        <div className="bg-red-50 p-3 rounded border border-red-200">
+                            <div className="text-2xl mb-1">😃 + ☹️</div>
+                            <div className="font-bold text-red-800">Different Signs</div>
+                            <div className="text-sm">Answer is NEGATIVE</div>
+                            <div className="font-mono text-xs mt-1">-5 × 5 = -25</div>
+                        </div>
+                    </div>
+                    <div className="bg-yellow-50 p-3 rounded border border-yellow-200 text-sm mt-2">
+                        <strong>⚠️ The Zero Rule:</strong>
+                        <ul className="list-disc pl-5 mt-1">
+                            <li>0 ÷ 5 = 0 (Totally fine)</li>
+                            <li>5 ÷ 0 = <strong>Undefined</strong> (Impossible!)</li>
+                        </ul>
+                    </div>
+                </div>
+                ),
+                questions: [
+                    {
+                        id: 11,
+                        question: "Divide: -50 ÷ 2",
+                        options: ["25", "-25", "52", "-48"],
+                        correctIndex: 1,
+                        explanation: "Signs are different (- and +). Answer must be negative. 50 ÷ 2 = 25. So, -25."
                     },
                     {
                         id: 12,
-                        question: "Fill in the blank: The slopes of parallel lines will be ________.",
-                        options: ["negative reciprocals", "the same", "opposites", "undefined"],
+                        question: "Multiply: -4 × -9",
+                        options: ["-36", "36", "-13", "13"],
                         correctIndex: 1,
-                        explanation: "Parallel lines never touch, so they must rise and run at exactly the same rate."
+                        explanation: "Signs are the same (both negative). Answer must be positive. 4 × 9 = 36."
+                    },
+                    {
+                        id: 13,
+                        question: "Divide: 12 ÷ 0",
+                        options: ["0", "12", "-12", "Undefined"],
+                        correctIndex: 3,
+                        explanation: "You cannot divide by zero. It is impossible/undefined."
                     },
                     {
                         id: 14,
-                        question: "What is an equation of the line PARALLEL to y = -2x + 4 that contains the point (1, 1)?",
-                        options: ["y = 2x + 4", "y = 3x + 4", "y = 2x - 4", "y = -2x + 3"],
-                        correctIndex: 3,
-                        explanation: "Parallel means same slope, so m = -2. Use point-slope: y - 1 = -2(x - 1). Simplify: y = -2x + 2 + 1 → y = -2x + 3."
-                    },
+                        question: "Divide: 0 ÷ -7",
+                        options: ["0", "7", "-7", "Undefined"],
+                        correctIndex: 0,
+                        explanation: "Zero divided by anything is just zero."
+                    }
+                ]
+            },
+            {
+                id: 'word_problems',
+                title: 'Word Problems',
+                icon: <TrendingDown size={20} />,
+                description: 'Real world applications.',
+                theory: (
+                <div className="space-y-4 text-slate-700">
+                    <h3 className="font-bold text-lg text-indigo-700">Keywords</h3>
+                    <ul className="list-disc pl-5 space-y-2">
+                        <li><strong>Negative Words:</strong> Descend, Drop, Withdraw, Below Sea Level, Debt.</li>
+                        <li><strong>Positive Words:</strong> Ascend, Rise, Deposit, Profit, Above.</li>
+                    </ul>
+                    <div className="bg-indigo-50 p-3 rounded border border-indigo-200 text-sm">
+                        <p><strong>Example:</strong> A diver descends 10ft per minute. Where are they after 5 mins?</p>
+                        <p className="font-mono mt-1">(-10) × 5 = -50ft</p>
+                    </div>
+                </div>
+                ),
+                questions: [
                     {
                         id: 15,
-                        question: "Line A has slope 3. Line B has slope -1/3. Are they perpendicular?",
-                        options: ["Yes", "No"],
+                        question: "A submarine descends (goes down) 15 feet every minute. How many feet will it have descended after 20 minutes?",
+                        options: ["35 ft", "-300 ft", "-35 ft", "300 ft"],
+                        correctIndex: 1,
+                        explanation: "Descend means negative (-15). Time is positive (20). Multiply: -15 × 20 = -300 ft."
+                    },
+                    {
+                        id: 16,
+                        question: "The temperature dropped 3 degrees every hour for 4 hours. What was the total change in temperature?",
+                        options: ["-12 degrees", "12 degrees", "-7 degrees", "7 degrees"],
                         correctIndex: 0,
-                        explanation: "Multiply them: 3 * (-1/3) = -1. Since the product is -1 (or they are flipped with opposite signs), they are perpendicular."
+                        explanation: "Drop means negative (-3). 4 hours is positive. -3 × 4 = -12."
                     }
                 ]
             }
@@ -205,31 +261,32 @@
 
         // --- VISUALIZERS ---
 
-        const DistanceVisualizer = ({ highlight }) => (
-            <div className="w-full h-48 bg-white rounded-lg border border-slate-200 relative mb-4 overflow-hidden">
-                <div className="absolute inset-0 opacity-10" style={{backgroundImage: 'radial-gradient(#6366f1 1px, transparent 1px)', backgroundSize: '20px 20px'}}></div>
-                <svg className="w-full h-full" viewBox="0 0 300 150">
-                    {/* Triangle */}
-                    <path d="M50,120 L250,120 L250,20 Z" fill="rgba(99, 102, 241, 0.1)" stroke="none" />
+        const NumberLineVisualizer = ({ highlight }) => (
+            <div className="w-full bg-white rounded-lg border border-slate-200 p-6 mb-6">
+                <div className="text-center mb-4 text-sm text-slate-500 font-bold">Visualizing Addition: Moving on the Line</div>
+                <div className="relative h-12 flex items-center">
+                    <div className="absolute w-full h-1 bg-slate-300 top-1/2"></div>
+                    {[-5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5].map((num, i) => (
+                        <div key={num} className="absolute text-xs font-mono text-slate-400 flex flex-col items-center" style={{left: `${(i/10)*100}%`}}>
+                            <div className="h-2 w-0.5 bg-slate-300 mb-1"></div>
+                            {num}
+                        </div>
+                    ))}
                     
-                    {/* Run */}
-                    <line x1="50" y1="120" x2="250" y2="120" stroke="#3b82f6" strokeWidth="3" strokeDasharray={highlight ? "5,5" : "0"} />
-                    <text x="150" y="140" fill="#3b82f6" fontSize="12" fontWeight="bold">Run (x₂-x₁)</text>
+                    {/* Animated Arrow Example for -2 + -3 */}
+                    <div className="absolute top-0 left-[50%] w-0.5 h-3 bg-red-500 z-10"></div> {/* Start at 0 */}
                     
-                    {/* Rise */}
-                    <line x1="250" y1="120" x2="250" y2="20" stroke="#ef4444" strokeWidth="3" strokeDasharray={highlight ? "5,5" : "0"} />
-                    <text x="260" y="70" fill="#ef4444" fontSize="12" fontWeight="bold" style={{writingMode: "vertical-rl"}}>Rise (y₂-y₁)</text>
-
-                    {/* Hypotenuse */}
-                    <line x1="50" y1="120" x2="250" y2="20" stroke="#10b981" strokeWidth="4" />
-                    <text x="130" y="60" fill="#10b981" fontSize="14" fontWeight="bold">Distance (d)</text>
-
-                    {/* Points */}
-                    <circle cx="50" cy="120" r="4" fill="#1e293b" />
-                    <text x="30" y="125" fontSize="12">P₁</text>
-                    <circle cx="250" cy="20" r="4" fill="#1e293b" />
-                    <text x="260" y="20" fontSize="12">P₂</text>
-                </svg>
+                    {/* Move to -2 */}
+                    <div className="absolute h-1 bg-red-500 top-1/2 left-[30%] w-[20%] opacity-50 rounded-full"></div>
+                    
+                    {/* Move 3 more left */}
+                    {highlight && (
+                        <div className="absolute h-1 bg-indigo-600 top-1/2 left-[0%] w-[30%] rounded-full animate-pulse"></div>
+                    )}
+                </div>
+                <div className="text-center mt-2 text-xs text-slate-400">
+                    Left is Negative (-) &nbsp;&nbsp;|&nbsp;&nbsp; Right is Positive (+)
+                </div>
             </div>
         );
 
@@ -244,7 +301,7 @@
 
         // --- MAIN APP COMPONENT ---
 
-        function Unit7Prep() {
+        function IntegerPrep() {
             const [view, setView] = useState('home'); // home, learn, practice
             const [activeTopicId, setActiveTopicId] = useState(null);
             const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0);
@@ -300,11 +357,11 @@
             const renderHome = () => (
                 <div className="max-w-3xl mx-auto p-6">
                     <div className="text-center mb-10">
-                    <h1 className="text-4xl font-extrabold text-indigo-900 mb-2">Geometry Unit 7 Prep</h1>
-                    <p className="text-slate-600">Midpoints, Distance, Polygons & Slopes.</p>
+                    <h1 className="text-4xl font-extrabold text-indigo-900 mb-2">Math Readiness</h1>
+                    <p className="text-slate-600">Mastering Integers: Addition, Subtraction, Multiplication & Division.</p>
                     </div>
 
-                    <div className="grid md:grid-cols-3 gap-6">
+                    <div className="grid md:grid-cols-2 gap-6">
                     {TOPICS.map((topic) => (
                         <div key={topic.id} className="bg-white rounded-xl shadow-md border border-slate-100 p-6 hover:shadow-lg transition-shadow flex flex-col h-full">
                         <div className="flex items-center gap-3 mb-3 text-indigo-600">
@@ -312,18 +369,18 @@
                             <h2 className="font-bold text-lg leading-tight">{topic.title}</h2>
                         </div>
                         <p className="text-sm text-slate-500 mb-6 flex-grow">{topic.description}</p>
-                        <div className="flex flex-col gap-2">
+                        <div className="flex gap-2">
                             <button 
                             onClick={() => handleTopicSelect(topic.id, 'learn')}
-                            className="w-full bg-indigo-50 text-indigo-700 py-2 rounded-lg font-medium hover:bg-indigo-100 transition-colors"
+                            className="flex-1 bg-indigo-50 text-indigo-700 py-2 rounded-lg font-medium hover:bg-indigo-100 transition-colors"
                             >
-                            Learn
+                            Learn Rules
                             </button>
                             <button 
                             onClick={() => handleTopicSelect(topic.id, 'practice')}
-                            className="w-full bg-indigo-600 text-white py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors"
+                            className="flex-1 bg-indigo-600 text-white py-2 rounded-lg font-medium hover:bg-indigo-700 transition-colors"
                             >
-                            Quiz
+                            Start Quiz
                             </button>
                         </div>
                         </div>
@@ -398,9 +455,9 @@
                             {question.question}
                         </h3>
 
-                        {/* Interactive Visual for Topic 1 */}
-                        {activeTopic.id === 'midpoint_distance' && (
-                            <DistanceVisualizer highlight={showExplanation} />
+                        {/* Interactive Visual for Addition */}
+                        {activeTopic.id === 'addition' && (
+                            <NumberLineVisualizer highlight={showExplanation} />
                         )}
 
                         <div className="space-y-3">
@@ -506,7 +563,7 @@
         }
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<Unit7Prep />);
+        root.render(<IntegerPrep />);
     </script>
 </body>
 </html>
