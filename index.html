@@ -3,34 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>StudyMastery: Probability & Randomness</title>
+    <title>StudyMastery: Geometry Edition</title>
     
-    <!-- React & ReactDOM -->
     <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
     
-    <!-- Babel for JSX -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
 
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Lucide Icons (Inline SVGs used in code, but loading library just in case for specific dynamic needs) -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
 
     <style>
         body { font-family: 'Inter', sans-serif; }
-        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        .fade-in { animation: fadeIn 0.3s ease-in; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-900">
@@ -39,554 +26,538 @@
     <script type="text/babel">
         const { useState, useEffect, useMemo } = React;
 
-        // ==========================================
-        // CONTENT DATABASE (Based on PDF Analysis)
-        // ==========================================
-        const curriculum = [
+        // --- ICONS ---
+        const Icon = ({ children, size = 20, className = "" }) => (
+            <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                {children}
+            </svg>
+        );
+        const TriangleIcon = (props) => <Icon {...props}><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></Icon>;
+        const Calculator = (props) => <Icon {...props}><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="16" y1="14" x2="16" y2="14"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="8" y1="18" x2="8" y2="18"/><line x1="12" y1="18" x2="12" y2="18"/><line x1="16" y1="18" x2="16" y2="18"/></Icon>;
+        const Mountain = (props) => <Icon {...props}><path d="m8 3 4 8 5-5 5 15H2L8 3z"/></Icon>;
+        const CheckCircle = (props) => <Icon {...props}><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></Icon>;
+        const XCircle = (props) => <Icon {...props}><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></Icon>;
+        const ArrowRight = (props) => <Icon {...props}><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></Icon>;
+        const ChevronLeft = (props) => <Icon {...props}><polyline points="15 18 9 12 15 6"/></Icon>;
+
+        // --- VISUALIZERS ---
+        
+        // Dynamic Right Triangle
+        const RightTriangleVisual = ({ a = "a", b = "b", c = "c", angleA = "", angleB = "", highlight }) => (
+            <div className="flex flex-col items-center justify-center p-4 bg-white rounded-xl shadow-sm border border-slate-200">
+                <svg width="200" height="200" viewBox="-10 -10 120 120" className="overflow-visible">
+                    {/* Triangle */}
+                    <path d="M0 100 L100 100 L0 0 Z" fill="none" stroke="#4F46E5" strokeWidth="3" />
+                    {/* Right Angle Box */}
+                    <rect x="0" y="85" width="15" height="15" fill="none" stroke="#94A3B8" strokeWidth="2" />
+                    
+                    {/* Labels */}
+                    <text x="-15" y="50" className="text-sm font-bold fill-slate-700" textAnchor="middle">{a}</text>
+                    <text x="50" y="115" className="text-sm font-bold fill-slate-700" textAnchor="middle">{b}</text>
+                    <text x="60" y="45" className="text-sm font-bold fill-slate-700" textAnchor="middle">{c}</text>
+                    
+                    {/* Angles */}
+                    {angleA && <text x="75" y="90" className="text-xs fill-slate-500">{angleA}</text>}
+                    {angleB && <text x="10" y="15" className="text-xs fill-slate-500">{angleB}</text>}
+                </svg>
+                <p className="mt-2 text-xs text-slate-400 font-mono text-center">Right Triangle Model</p>
+            </div>
+        );
+
+        // Special Triangles Visualizer
+        const SpecialTriangleVisual = ({ type }) => {
+            const is45 = type === '45-45-90';
+            return (
+                <div className="flex flex-col items-center justify-center p-4 bg-white rounded-xl shadow-sm border border-slate-200">
+                    <svg width="200" height="180" viewBox="-10 -10 120 120" className="overflow-visible">
+                        {is45 ? (
+                            // 45-45-90
+                            <>
+                                <path d="M0 100 L100 100 L0 0 Z" fill="none" stroke="#0ea5e9" strokeWidth="3" />
+                                <text x="-15" y="50" className="text-sm font-bold fill-slate-700">x</text>
+                                <text x="50" y="115" className="text-sm font-bold fill-slate-700">x</text>
+                                <text x="60" y="45" className="text-sm font-bold text-blue-600 fill-blue-600">x√2</text>
+                                <text x="10" y="15" className="text-xs fill-slate-500">45°</text>
+                                <text x="80" y="90" className="text-xs fill-slate-500">45°</text>
+                            </>
+                        ) : (
+                            // 30-60-90
+                            <>
+                                <path d="M0 100 L60 100 L0 0 Z" fill="none" stroke="#7c3aed" strokeWidth="3" />
+                                <text x="-25" y="50" className="text-sm font-bold text-purple-600 fill-purple-600">x√3</text>
+                                <text x="30" y="115" className="text-sm font-bold fill-slate-700">x</text>
+                                <text x="40" y="45" className="text-sm font-bold fill-slate-700">2x</text>
+                                <text x="5" y="15" className="text-xs fill-slate-500">30°</text>
+                                <text x="45" y="90" className="text-xs fill-slate-500">60°</text>
+                            </>
+                        )}
+                        <rect x="0" y="85" width="15" height="15" fill="none" stroke="#94A3B8" strokeWidth="2" />
+                    </svg>
+                    <p className="mt-2 text-xs text-slate-400 font-mono">{is45 ? "Isosceles Right Triangle" : "Half Equilateral Triangle"}</p>
+                </div>
+            );
+        };
+
+        // --- CURRICULUM DATA ---
+
+        const TOPICS = [
             {
-                id: "independent-dependent",
-                title: "Independent vs. Dependent Events",
-                icon: "repeat",
-                color: "blue",
-                theory: {
-                    intro: "When dealing with multiple events, the most critical question is: Does the first event change the options for the second?",
-                    points: [
-                        { title: "Independent Events", text: "The outcome of one event does NOT affect the other. Example: Rolling a die, then flipping a coin. Or drawing a card and PUTTING IT BACK (Replacement)." },
-                        { title: "Dependent Events", text: "The outcome of the first event changes the probability of the second. Example: Eating a jellybean from a jar. There is now one less jellybean for the next pick (No Replacement)." }
-                    ]
-                },
+                id: 'pythag',
+                title: 'Pythagorean Theorem',
+                icon: <TriangleIcon size={24} />,
+                description: 'Determine side lengths and classify triangles.',
+                theory: (
+                    <div className="space-y-6">
+                        <div className="bg-indigo-50 p-4 rounded-xl border border-indigo-100">
+                            <h3 className="text-lg font-bold text-indigo-900 mb-2">The Golden Rule</h3>
+                            <p className="mb-3 text-indigo-800">For any right triangle with legs <strong>a</strong> and <strong>b</strong> and hypotenuse <strong>c</strong>:</p>
+                            <div className="text-2xl font-mono text-center bg-white p-3 rounded-lg shadow-sm text-indigo-600 font-bold border border-indigo-200">
+                                a² + b² = c²
+                            </div>
+                        </div>
+
+                        <div className="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <h4 className="font-bold text-slate-700 mb-2">Finding a Side</h4>
+                                <ul className="list-disc pl-5 space-y-2 text-sm text-slate-600">
+                                    <li><strong>Missing Hypotenuse (c):</strong> Square the legs, add them, then take the square root.</li>
+                                    <li><strong>Missing Leg (a or b):</strong> Square the hypotenuse, subtract the squared leg, then take the square root.</li>
+                                </ul>
+                            </div>
+                            <RightTriangleVisual a="Leg" b="Leg" c="Hyp" />
+                        </div>
+
+                        <div className="bg-amber-50 p-4 rounded-xl border border-amber-100">
+                            <h3 className="text-lg font-bold text-amber-900 mb-2">The Converse (Classifying Triangles)</h3>
+                            <p className="text-sm text-amber-800 mb-2">Compare <strong>c²</strong> to <strong>a² + b²</strong> (where c is the longest side):</p>
+                            <div className="grid grid-cols-1 gap-2 text-sm">
+                                <div className="bg-white px-3 py-2 rounded border border-amber-200 flex justify-between">
+                                    <span>c² = a² + b²</span>
+                                    <span className="font-bold text-green-600">Right Triangle</span>
+                                </div>
+                                <div className="bg-white px-3 py-2 rounded border border-amber-200 flex justify-between">
+                                    <span>c² < a² + b²</span>
+                                    <span className="font-bold text-blue-600">Acute Triangle</span>
+                                </div>
+                                <div className="bg-white px-3 py-2 rounded border border-amber-200 flex justify-between">
+                                    <span>c² > a² + b²</span>
+                                    <span className="font-bold text-red-600">Obtuse Triangle</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ),
                 questions: [
                     {
-                        id: 1,
-                        question: "You have a deck of 10 numbered cards (1-10). You pick a card, look at it, and keep it in your pocket. Then you pick another card. Is this Independent or Dependent?",
-                        options: ["Independent", "Dependent"],
-                        correct: 1,
-                        explanation: "Since you kept the card in your pocket, there are only 9 cards left for the second draw. The total changed, making it Dependent."
+                        question: "A right triangle has legs of length 5 and 12. What is the length of the hypotenuse?",
+                        options: ["13", "15", "17", "√119"],
+                        correctIndex: 0,
+                        explanation: "Use a² + b² = c². 5² + 12² = 25 + 144 = 169. √169 = 13."
                     },
                     {
-                        id: 2,
-                        question: "A spinner has 4 colors. You spin it once, record the color, and spin it again. Independent or Dependent?",
-                        options: ["Independent", "Dependent"],
-                        correct: 0,
-                        explanation: "The spinner doesn't change after you spin it. The probabilities remain exactly the same for the second spin."
+                        question: "A triangle has sides 7, 8, and 12. What type of triangle is it?",
+                        options: ["Acute", "Right", "Obtuse", "Isosceles"],
+                        correctIndex: 2,
+                        explanation: "Check c² vs a² + b². Longest side is 12. 12² = 144. 7² + 8² = 49 + 64 = 113. Since 144 > 113, c² is greater, so it is Obtuse."
                     },
                     {
-                        id: 3,
-                        question: "A cookie jar has 5 chocolate and 5 oatmeal cookies. You eat one chocolate cookie. What is the probability of picking a chocolate cookie next?",
-                        options: ["5/10 (50%)", "4/10 (40%)", "4/9 (44.4%)", "5/9 (55.5%)"],
-                        correct: 2,
-                        explanation: "This is a dependent event. You started with 10. You ate 1, so 9 are left. You ate a chocolate, so only 4 chocolate are left. Result: 4/9."
+                        question: "A painter leans a 15-foot ladder against a wall. The base is 9 feet from the wall. How high up the wall does it reach?",
+                        options: ["6 ft", "12 ft", "10 ft", "√306 ft"],
+                        correctIndex: 1,
+                        explanation: "Ladder is hypotenuse (15). Base is leg (9). b² = 15² - 9² = 225 - 81 = 144. √144 = 12."
                     }
                 ]
             },
             {
-                id: "compound-probability",
-                title: "Compound Probability",
-                icon: "layers",
-                color: "indigo",
-                theory: {
-                    intro: "Compound probability involves finding the chance of two or more things happening together.",
-                    points: [
-                        { title: "The 'AND' Rule (Multiplication)", text: "To find the probability of Event A AND Event B happening, you MULTIPLY their probabilities." },
-                        { title: "Formula", text: "P(A and B) = P(A) × P(B)" },
-                        { title: "Watch Out!", text: "If the events are Dependent (see Module 1), make sure you adjust the fraction for the second event before multiplying!" }
-                    ]
-                },
+                id: 'special',
+                title: 'Special Right Triangles',
+                icon: <Icon><path d="M21 16V4H9l12 12z"/></Icon>,
+                description: 'Shortcuts for 45-45-90 and 30-60-90 triangles.',
+                theory: (
+                    <div className="space-y-6">
+                        <div className="grid md:grid-cols-2 gap-6">
+                            {/* 45-45-90 */}
+                            <div className="space-y-2">
+                                <h3 className="font-bold text-blue-700">45°-45°-90° Rules</h3>
+                                <SpecialTriangleVisual type="45-45-90" />
+                                <div className="bg-blue-50 p-3 rounded text-sm text-blue-900">
+                                    <p>Legs are equal (x).</p>
+                                    <p className="font-bold mt-1">Hypotenuse = Leg × √2</p>
+                                </div>
+                            </div>
+                            
+                            {/* 30-60-90 */}
+                            <div className="space-y-2">
+                                <h3 className="font-bold text-purple-700">30°-60°-90° Rules</h3>
+                                <SpecialTriangleVisual type="30-60-90" />
+                                <div className="bg-purple-50 p-3 rounded text-sm text-purple-900">
+                                    <p>Everything relates to the <strong>Short Leg</strong>.</p>
+                                    <ul className="list-disc pl-4 mt-1 space-y-1">
+                                        <li>Hypotenuse = 2 × Short Leg</li>
+                                        <li>Long Leg = Short Leg × √3</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ),
                 questions: [
                     {
-                        id: 1,
-                        question: "A drawer contains 4 red socks and 6 blue socks (10 total). You pick one, put it back, then pick another. Probability of Red AND Red?",
-                        options: ["16%", "24%", "40%", "10%"],
-                        correct: 0,
-                        explanation: "P(Red) = 4/10. Since you put it back (Independent), the second P(Red) is also 4/10. Multiply: 0.4 × 0.4 = 0.16 (16%)."
+                        question: "In a 45°-45°-90° triangle, one leg is 8. What is the length of the hypotenuse?",
+                        options: ["8", "16", "8√2", "8√3"],
+                        correctIndex: 2,
+                        explanation: "In a 45-45-90 triangle, Hypotenuse = Leg × √2. So, 8√2."
                     },
                     {
-                        id: 2,
-                        question: "A box has 3 Lemon chews and 7 Cherry chews (10 total). You eat one Lemon chew, then pick another chew. Probability of Lemon THEN Lemon?",
-                        options: ["9/100", "6/90", "3/10", "1/10"],
-                        correct: 1,
-                        explanation: "First pick: 3/10. Second pick (Dependent!): Only 2 Lemons left and 9 total chews left (2/9). Multiply: (3/10) × (2/9) = 6/90."
+                        question: "In a 30°-60°-90° triangle, the hypotenuse is 20. What is the length of the shorter leg?",
+                        options: ["10", "10√3", "20√2", "40"],
+                        correctIndex: 0,
+                        explanation: "Hypotenuse = 2 × Short Leg. 20 = 2x, so x = 10."
                     },
                     {
-                        id: 3,
-                        question: "You roll a standard die and flip a coin. Probability of rolling a 6 AND getting Tails?",
-                        options: ["1/6", "1/2", "1/12", "1/8"],
-                        correct: 2,
-                        explanation: "P(6) = 1/6. P(Tails) = 1/2. These are independent. Multiply: (1/6) × (1/2) = 1/12."
+                        question: "An equilateral triangle has a height of 5√3. What is the length of one side?",
+                        options: ["5", "10", "15", "5√2"],
+                        correctIndex: 1,
+                        explanation: "Splitting an equilateral triangle creates two 30-60-90 triangles. The height is the Long Leg (x√3). Here, x√3 = 5√3, so x (short leg) = 5. The side of the equilateral triangle is 2x, which is 10."
                     }
                 ]
             },
             {
-                id: "modeling-randomness",
-                title: "Expected Value & Area",
-                icon: "target",
-                color: "emerald",
-                theory: {
-                    intro: "Expected Value (EV) helps us predict the 'average' outcome if we repeated an experiment thousands of times. It is crucial for games of chance and insurance.",
-                    points: [
-                        { title: "Geometric Probability", text: "If a target has different zones, the probability of hitting a zone is: (Area of Zone) / (Total Area)." },
-                        { title: "Calculating Expected Value", text: "Multiply each outcome's value (points or money) by its probability, then add them all together." },
-                        { title: "Formula", text: "EV = (Value1 × Prob1) + (Value2 × Prob2) + ..." }
-                    ]
-                },
+                id: 'trig',
+                title: 'Trigonometry Ratios',
+                icon: <Calculator size={24} />,
+                description: 'SOH CAH TOA and solving for sides/angles.',
+                theory: (
+                    <div className="space-y-6">
+                        <div className="flex items-center justify-center bg-slate-800 text-white p-6 rounded-xl shadow-lg">
+                            <h1 className="text-4xl font-black tracking-widest">SOH CAH TOA</h1>
+                        </div>
+                        
+                        <div className="grid gap-3 text-sm">
+                            <div className="bg-pink-50 p-3 rounded border border-pink-200">
+                                <strong className="text-pink-700 text-lg">SOH</strong> : Sin(θ) = Opposite / Hypotenuse
+                            </div>
+                            <div className="bg-teal-50 p-3 rounded border border-teal-200">
+                                <strong className="text-teal-700 text-lg">CAH</strong> : Cos(θ) = Adjacent / Hypotenuse
+                            </div>
+                            <div className="bg-orange-50 p-3 rounded border border-orange-200">
+                                <strong className="text-orange-700 text-lg">TOA</strong> : Tan(θ) = Opposite / Adjacent
+                            </div>
+                        </div>
+
+                        <div className="bg-slate-100 p-4 rounded-xl">
+                            <h4 className="font-bold text-slate-700 mb-2">When to use what?</h4>
+                            <ul className="list-disc pl-5 space-y-2 text-sm text-slate-600">
+                                <li><strong>Missing Side?</strong> Use regular sin, cos, or tan. (e.g., x = 10 * sin(30))</li>
+                                <li><strong>Missing Angle?</strong> Use inverse trig (sin⁻¹, cos⁻¹, tan⁻¹).</li>
+                            </ul>
+                        </div>
+                    </div>
+                ),
                 questions: [
                     {
-                        id: 1,
-                        question: "A game board is 100 in². The winning 'Red Zone' is 20 in². If you hit Red, you win $10. If you miss Red, you lose $2. What is the expected value per throw?",
-                        options: ["$2.00", "$0.40", "$1.00", "$8.00"],
-                        correct: 1,
-                        explanation: "P(Red) = 20/100 = 0.2. P(Miss) = 80/100 = 0.8. EV = (0.2 × $10) + (0.8 × -$2) = $2.00 - $1.60 = $0.40."
+                        question: "In a right triangle, angle A is 30°. The hypotenuse is 100. What is the length of the opposite side?",
+                        options: ["50", "86.6", "100", "200"],
+                        correctIndex: 0,
+                        explanation: "Use SOH. Sin(30°) = Opp / 100. 0.5 = x / 100. x = 50."
                     },
                     {
-                        id: 2,
-                        question: "A raffle ticket costs $5. There is a 1/100 chance to win $200, and a 99/100 chance to win nothing ($0). What is the expected value of buying a ticket?",
-                        options: ["$200", "-$3.00", "$2.00", "-$5.00"],
-                        correct: 1,
-                        explanation: "Ignore the cost first. Expected Winnings = (1/100 × $200) + (99/100 × 0) = $2. Now subtract the cost ($5). Total EV = $2 - $5 = -$3.00."
+                        question: "A ramp rises 5 feet over a horizontal distance of 12 feet. What is Tan(θ) of the angle of elevation?",
+                        options: ["12/5", "5/12", "5/13", "12/13"],
+                        correctIndex: 1,
+                        explanation: "TOA means Tan = Opposite / Adjacent. Rise (Opposite) = 5, Run (Adjacent) = 12. So 5/12."
                     },
                     {
-                        id: 3,
-                        question: "A dartboard has a Bullseye (10 pts, area=5) and Outer Ring (2 pts, area=45). Total area is 50. Expected score?",
-                        options: ["2.8 points", "6 points", "3.4 points", "5 points"],
-                        correct: 0,
-                        explanation: "P(Bullseye) = 5/50 = 0.1. P(Outer) = 45/50 = 0.9. EV = (0.1 × 10) + (0.9 × 2) = 1 + 1.8 = 2.8 points."
+                        question: "Which function would you use to find an angle if you know the Adjacent leg and the Hypotenuse?",
+                        options: ["Sine", "Cosine", "Tangent", "Pythagoras"],
+                        correctIndex: 1,
+                        explanation: "Adjacent and Hypotenuse relate to CAH -> Cosine."
+                    }
+                ]
+            },
+            {
+                id: 'elevation',
+                title: 'Angles of Elevation & Depression',
+                icon: <Mountain size={24} />,
+                description: 'Word problems involving looking up or down.',
+                theory: (
+                    <div className="space-y-6">
+                        <div className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                            <h3 className="font-bold text-slate-800 mb-4">Definitions</h3>
+                            <div className="space-y-4">
+                                <div className="flex gap-4 items-start">
+                                    <div className="bg-blue-100 p-2 rounded text-blue-600 font-bold">Elevation</div>
+                                    <p className="text-sm text-slate-600">Looking <strong>UP</strong> from the horizontal. (Ground to Top of Building)</p>
+                                </div>
+                                <div className="flex gap-4 items-start">
+                                    <div className="bg-green-100 p-2 rounded text-green-600 font-bold">Depression</div>
+                                    <p className="text-sm text-slate-600">Looking <strong>DOWN</strong> from the horizontal. (Airplane to Airport)</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-yellow-50 p-4 rounded-xl border border-yellow-200 text-sm">
+                            <strong className="block text-yellow-800 mb-1">PRO TIP: Alternate Interior Angles</strong>
+                            <p>The Angle of Depression from the top is usually <strong>EQUAL</strong> to the Angle of Elevation from the bottom because the horizontal lines are parallel!</p>
+                        </div>
+                    </div>
+                ),
+                questions: [
+                    {
+                        question: "An airplane pilot sights the runway at a 20° angle of depression. If the plane is 2,000 ft high, what is the ground distance (x) to the runway?",
+                        options: ["2000 * tan(20)", "2000 / tan(20)", "2000 * sin(20)", "2000 / cos(20)"],
+                        correctIndex: 1,
+                        explanation: "Angle of depression = Angle of elevation = 20°. We have Opposite (height = 2000) and need Adjacent (x). Tan(20) = 2000/x. Solve for x: x = 2000 / tan(20)."
+                    },
+                    {
+                        question: "You stand 100 feet from a tree. The angle of elevation to the top is 45°. How tall is the tree?",
+                        options: ["50 ft", "100 ft", "141 ft", "200 ft"],
+                        correctIndex: 1,
+                        explanation: "Tan(45°) = Height / 100. Since Tan(45°) = 1, Height = 100."
+                    },
+                    {
+                        question: "Which describes the angle of depression?",
+                        options: ["Angle between line of sight and vertical", "Angle looking up from ground", "Angle between horizontal and looking down", "Angle inside the object"],
+                        correctIndex: 2,
+                        explanation: "Depression is always measured from the HORIZONTAL line, looking down."
                     }
                 ]
             }
         ];
 
-        // ==========================================
-        // VISUALIZER COMPONENTS
-        // ==========================================
-        
-        // 1. Marble/Card Visualizer (Independent vs Dependent)
-        const UrnVisualizer = () => {
-            const [marbles, setMarbles] = useState([
-                {id: 1, color: 'bg-red-500'}, {id: 2, color: 'bg-red-500'}, 
-                {id: 3, color: 'bg-blue-500'}, {id: 4, color: 'bg-blue-500'}, {id: 5, color: 'bg-blue-500'}
-            ]);
-            const [picked, setPicked] = useState([]);
-            const [mode, setMode] = useState('dependent'); // 'independent' or 'dependent'
-            const [history, setHistory] = useState("");
+        // --- COMPONENTS ---
 
-            const pickMarble = () => {
-                if (marbles.length === 0) return;
-                const randomIndex = Math.floor(Math.random() * marbles.length);
-                const selected = marbles[randomIndex];
-                
-                // Animation logic
-                setPicked([selected]);
-                
-                if (mode === 'dependent') {
-                    const newMarbles = marbles.filter((_, i) => i !== randomIndex);
-                    setMarbles(newMarbles);
-                    setHistory(`Picked ${selected.color === 'bg-red-500' ? 'Red' : 'Blue'}. Remaining: ${newMarbles.length}`);
-                } else {
-                    setHistory(`Picked ${selected.color === 'bg-red-500' ? 'Red' : 'Blue'}. Put it back. Remaining: ${marbles.length}`);
-                }
+        function App() {
+            const [view, setView] = useState('home'); // home, learn, practice, results
+            const [activeTopicId, setActiveTopicId] = useState(null);
+            const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0);
+            const [score, setScore] = useState(0);
+            const [streak, setStreak] = useState(0);
+            const [feedback, setFeedback] = useState(null); // { type: 'correct' | 'incorrect', text: '' }
+
+            const activeTopic = TOPICS.find(t => t.id === activeTopicId);
+
+            const handleStartTopic = (topicId) => {
+                setActiveTopicId(topicId);
+                setView('learn');
             };
 
-            const reset = () => {
-                setMarbles([
-                    {id: 1, color: 'bg-red-500'}, {id: 2, color: 'bg-red-500'}, 
-                    {id: 3, color: 'bg-blue-500'}, {id: 4, color: 'bg-blue-500'}, {id: 5, color: 'bg-blue-500'}
-                ]);
-                setPicked([]);
-                setHistory("Jar reset.");
-            }
+            const handleStartPractice = () => {
+                setCurrentQuestionIdx(0);
+                setScore(0);
+                setStreak(0);
+                setFeedback(null);
+                setView('practice');
+            };
 
-            return (
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 my-4">
-                    <h3 className="font-bold text-lg mb-2">Simulate: The Marble Jar</h3>
-                    <div className="flex gap-4 mb-4 text-sm">
-                        <button onClick={() => { setMode('independent'); reset(); }} className={`px-3 py-1 rounded-full ${mode === 'independent' ? 'bg-blue-600 text-white' : 'bg-slate-100'}`}>Independent (With Replacement)</button>
-                        <button onClick={() => { setMode('dependent'); reset(); }} className={`px-3 py-1 rounded-full ${mode === 'dependent' ? 'bg-blue-600 text-white' : 'bg-slate-100'}`}>Dependent (No Replacement)</button>
-                    </div>
+            const handleAnswer = (index) => {
+                if (feedback) return; // Prevent double clicking
 
-                    <div className="flex items-center justify-center gap-8 mb-4">
-                        {/* The Jar */}
-                        <div className="w-32 h-32 border-4 border-slate-300 rounded-b-xl rounded-t-md relative flex flex-wrap content-end p-2 gap-1 bg-slate-50">
-                            {marbles.map(m => (
-                                <div key={m.id} className={`w-6 h-6 rounded-full shadow-sm ${m.color}`}></div>
-                            ))}
-                        </div>
-                        
-                        {/* The Arrow */}
-                        <div className="text-2xl text-slate-400">➔</div>
+                const question = activeTopic.questions[currentQuestionIdx];
+                const isCorrect = index === question.correctIndex;
 
-                        {/* The Hand/Pick */}
-                        <div className="w-16 h-16 border-2 border-dashed border-slate-300 rounded-lg flex items-center justify-center">
-                            {picked.length > 0 ? (
-                                <div className={`w-8 h-8 rounded-full ${picked[0].color} animate-bounce`}></div>
-                            ) : <span className="text-xs text-slate-400">?</span>}
-                        </div>
-                    </div>
-
-                    <div className="text-center">
-                        <button onClick={pickMarble} disabled={marbles.length === 0} className="bg-emerald-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-emerald-600 disabled:opacity-50">
-                            Pick a Marble
-                        </button>
-                        <button onClick={reset} className="ml-2 text-slate-500 px-4 py-2 hover:text-slate-700">Reset</button>
-                    </div>
-                    <p className="text-center text-sm text-slate-600 mt-3 font-mono">{history}</p>
-                </div>
-            );
-        };
-
-        // 2. Dartboard Visualizer (Expected Value)
-        const DartboardVisualizer = () => {
-            const [highlight, setHighlight] = useState(null);
-            
-            // Areas: 
-            // Blue (Outer): Area 400, Value 5
-            // Red (Inner): Area 100, Value 20
-            
-            const totalArea = 500;
-            const pRed = 100/500;
-            const pBlue = 400/500;
-            
-            const ev = (pRed * 20) + (pBlue * 5);
-
-            return (
-                <div className="bg-white p-6 rounded-xl shadow-sm border border-slate-200 my-4 flex flex-col md:flex-row items-center gap-8">
-                    <div className="relative w-48 h-48">
-                        <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-md">
-                            {/* Outer Circle (Blue) */}
-                            <circle cx="50" cy="50" r="48" fill="#3b82f6" 
-                                className={`transition-opacity cursor-pointer ${highlight === 'blue' ? 'opacity-100 stroke-4 stroke-white' : 'opacity-80 hover:opacity-100'}`}
-                                onMouseEnter={() => setHighlight('blue')}
-                                onMouseLeave={() => setHighlight(null)}
-                            />
-                            {/* Inner Circle (Red) */}
-                            <circle cx="50" cy="50" r="24" fill="#ef4444" 
-                                className={`transition-opacity cursor-pointer ${highlight === 'red' ? 'opacity-100 stroke-4 stroke-white' : 'opacity-90 hover:opacity-100'}`}
-                                onMouseEnter={() => setHighlight('red')}
-                                onMouseLeave={() => setHighlight(null)}
-                            />
-                            <text x="50" y="30" textAnchor="middle" fill="white" className="text-[10px] font-bold pointer-events-none">20 pts</text>
-                            <text x="50" y="80" textAnchor="middle" fill="white" className="text-[10px] font-bold pointer-events-none">5 pts</text>
-                        </svg>
-                    </div>
-                    
-                    <div className="flex-1 space-y-2 text-sm">
-                        <h4 className="font-bold text-slate-700">Expected Value Calculator</h4>
-                        
-                        <div className={`p-2 rounded transition-colors ${highlight === 'red' ? 'bg-red-50 border border-red-200' : ''}`}>
-                            <span className="font-bold text-red-600">Red Zone:</span> 
-                            <div className="grid grid-cols-2 gap-2 text-xs text-slate-600">
-                                <div>Area: 100</div>
-                                <div>Prob: 100/{totalArea} = <strong>0.2</strong></div>
-                            </div>
-                        </div>
-
-                        <div className={`p-2 rounded transition-colors ${highlight === 'blue' ? 'bg-blue-50 border border-blue-200' : ''}`}>
-                            <span className="font-bold text-blue-600">Blue Zone:</span> 
-                            <div className="grid grid-cols-2 gap-2 text-xs text-slate-600">
-                                <div>Area: 400</div>
-                                <div>Prob: 400/{totalArea} = <strong>0.8</strong></div>
-                            </div>
-                        </div>
-
-                        <div className="mt-4 pt-2 border-t border-slate-200">
-                            <div className="font-mono text-xs text-slate-500">
-                                EV = ({pRed} × 20) + ({pBlue} × 5)
-                            </div>
-                            <div className="font-mono text-xs text-slate-500">
-                                EV = {pRed * 20} + {pBlue * 5}
-                            </div>
-                            <div className="font-bold text-lg text-emerald-600">
-                                EV = {ev} points
-                            </div>
-                            <p className="text-xs text-slate-400">On average, you earn {ev} pts per throw.</p>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        // ==========================================
-        // MAIN APP COMPONENTS
-        // ==========================================
-
-        const HomeView = ({ onSelectModule, score, streak }) => {
-            return (
-                <div className="fade-in max-w-4xl mx-auto p-4">
-                    <header className="mb-8 text-center">
-                        <h1 className="text-4xl font-extrabold text-indigo-900 mb-2">StudyMastery</h1>
-                        <p className="text-slate-500">Probability & Statistics Unit Review</p>
-                        
-                        <div className="flex justify-center gap-6 mt-6">
-                            <div className="bg-white px-4 py-2 rounded-lg shadow-sm border border-slate-200 flex items-center gap-2">
-                                <span className="text-yellow-500 text-xl">★</span>
-                                <span className="font-bold text-slate-700">{score} XP</span>
-                            </div>
-                            <div className="bg-white px-4 py-2 rounded-lg shadow-sm border border-slate-200 flex items-center gap-2">
-                                <span className="text-orange-500 text-xl">🔥</span>
-                                <span className="font-bold text-slate-700">{streak} Streak</span>
-                            </div>
-                        </div>
-                    </header>
-
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {curriculum.map((mod, idx) => (
-                            <button 
-                                key={mod.id}
-                                onClick={() => onSelectModule(idx)}
-                                className="bg-white p-6 rounded-2xl shadow-sm hover:shadow-md border border-slate-100 hover:border-indigo-200 transition-all text-left group"
-                            >
-                                <div className={`w-12 h-12 rounded-full bg-${mod.color}-100 text-${mod.color}-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
-                                    {/* Icon Placeholder based on color logic */}
-                                    <span className="font-bold text-xl">{idx + 1}</span>
-                                </div>
-                                <h2 className="text-xl font-bold text-slate-800 mb-2 group-hover:text-indigo-600">{mod.title}</h2>
-                                <p className="text-sm text-slate-500 line-clamp-2">{mod.theory.intro}</p>
-                                <div className="mt-4 text-xs font-semibold text-indigo-500 flex items-center">
-                                    START MODULE <span>→</span>
-                                </div>
-                            </button>
-                        ))}
-                    </div>
-                </div>
-            );
-        };
-
-        const LearnView = ({ module, onNext }) => {
-            return (
-                <div className="fade-in max-w-3xl mx-auto p-4">
-                    <button onClick={() => window.location.reload()} className="text-sm text-slate-400 hover:text-indigo-600 mb-4">← Back to Dashboard</button>
-                    
-                    <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-                        <div className={`bg-${module.color}-600 p-8 text-white`}>
-                            <div className="uppercase tracking-wide text-xs font-bold opacity-70 mb-2">Theory Phase</div>
-                            <h2 className="text-3xl font-bold">{module.title}</h2>
-                        </div>
-                        
-                        <div className="p-8">
-                            <p className="text-lg text-slate-700 leading-relaxed mb-6">{module.theory.intro}</p>
-                            
-                            <div className="grid gap-4 mb-8">
-                                {module.theory.points.map((pt, i) => (
-                                    <div key={i} className="bg-slate-50 p-4 rounded-xl border-l-4 border-indigo-400">
-                                        <h4 className="font-bold text-indigo-900 mb-1">{pt.title}</h4>
-                                        <p className="text-slate-600">{pt.text}</p>
-                                    </div>
-                                ))}
-                            </div>
-
-                            {/* Inject Relevant Visualizer */}
-                            {module.id === 'independent-dependent' && <UrnVisualizer />}
-                            {module.id === 'modeling-randomness' && <DartboardVisualizer />}
-                            {module.id === 'compound-probability' && (
-                                <div className="bg-indigo-50 p-6 rounded-xl border border-indigo-100 my-4 text-center">
-                                    <h3 className="font-bold text-indigo-800 mb-2">Visualizing Compound Events</h3>
-                                    <p className="text-sm text-indigo-600 mb-4">Multiply fractions along the path.</p>
-                                    <div className="flex justify-center items-center font-mono text-lg">
-                                        <div className="bg-white px-3 py-1 rounded shadow">P(A)</div>
-                                        <span className="mx-2">×</span>
-                                        <div className="bg-white px-3 py-1 rounded shadow">P(B)</div>
-                                        <span className="mx-2">=</span>
-                                        <div className="bg-emerald-100 text-emerald-800 px-3 py-1 rounded shadow font-bold">P(A and B)</div>
-                                    </div>
-                                </div>
-                            )}
-
-                            <div className="mt-8 flex justify-end">
-                                <button 
-                                    onClick={onNext}
-                                    className="bg-indigo-600 text-white px-8 py-3 rounded-full font-bold text-lg hover:bg-indigo-700 shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
-                                >
-                                    Start Practice <span className="text-xl">→</span>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            );
-        };
-
-        const PracticeView = ({ module, updateScore, goHome }) => {
-            const [currentQ, setCurrentQ] = useState(0);
-            const [selected, setSelected] = useState(null);
-            const [isChecking, setIsChecking] = useState(false);
-            const [feedback, setFeedback] = useState(null); // { isCorrect, text }
-            const [completed, setCompleted] = useState(false);
-            const [results, setResults] = useState({ correct: 0, total: module.questions.length });
-
-            const question = module.questions[currentQ];
-
-            const handleCheck = () => {
-                if (selected === null) return;
-                
-                const isCorrect = selected === question.correct;
-                setIsChecking(true);
-                
                 if (isCorrect) {
-                    setFeedback({ type: 'success', text: "Correct! " + question.explanation });
-                    updateScore(true);
-                    setResults(prev => ({ ...prev, correct: prev.correct + 1 }));
+                    setScore(s => s + 10);
+                    setStreak(s => s + 1);
+                    setFeedback({ type: 'correct', text: 'Correct! ' + question.explanation });
                 } else {
-                    setFeedback({ type: 'error', text: "Not quite. " + question.explanation });
-                    updateScore(false);
+                    setStreak(0);
+                    setFeedback({ type: 'incorrect', text: 'Not quite. ' + question.explanation });
                 }
             };
 
-            const handleNext = () => {
-                if (currentQ < module.questions.length - 1) {
-                    setCurrentQ(prev => prev + 1);
-                    setSelected(null);
-                    setIsChecking(false);
-                    setFeedback(null);
+            const nextQuestion = () => {
+                setFeedback(null);
+                if (currentQuestionIdx < activeTopic.questions.length - 1) {
+                    setCurrentQuestionIdx(prev => prev + 1);
                 } else {
-                    setCompleted(true);
+                    setView('results');
                 }
             };
 
-            if (completed) {
+            // --- VIEWS ---
+
+            if (view === 'home') {
                 return (
-                    <div className="fade-in max-w-2xl mx-auto p-4 pt-12 text-center">
-                        <div className="bg-white p-8 rounded-2xl shadow-lg border border-slate-100">
-                            <div className="text-6xl mb-4">{results.correct === results.total ? '🏆' : '👏'}</div>
-                            <h2 className="text-3xl font-bold text-slate-800 mb-2">Module Complete!</h2>
-                            <p className="text-slate-500 mb-6">You scored {results.correct} out of {results.total}</p>
-                            
-                            <div className="w-full bg-slate-100 rounded-full h-4 mb-8 overflow-hidden">
-                                <div 
-                                    className="bg-indigo-500 h-full transition-all duration-1000" 
-                                    style={{ width: `${(results.correct/results.total)*100}%` }}
-                                ></div>
-                            </div>
-
-                            <button 
-                                onClick={goHome}
-                                className="w-full bg-slate-900 text-white py-3 rounded-xl font-bold hover:bg-slate-800 transition-colors"
-                            >
-                                Back to Dashboard
-                            </button>
+                    <div className="min-h-screen bg-slate-50 p-4 md:p-8 max-w-4xl mx-auto">
+                        <header className="mb-8 text-center">
+                            <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-2 tracking-tight">StudyMastery</h1>
+                            <p className="text-slate-500 font-medium">Common Core Geometry Unit 4</p>
+                        </header>
+                        
+                        <div className="grid md:grid-cols-2 gap-4">
+                            {TOPICS.map(topic => (
+                                <button 
+                                    key={topic.id}
+                                    onClick={() => handleStartTopic(topic.id)}
+                                    className="group bg-white p-6 rounded-2xl shadow-sm border border-slate-200 hover:border-indigo-500 hover:shadow-md transition-all text-left flex items-start gap-4"
+                                >
+                                    <div className="bg-indigo-50 text-indigo-600 p-3 rounded-xl group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                                        {topic.icon}
+                                    </div>
+                                    <div>
+                                        <h2 className="font-bold text-lg text-slate-800 group-hover:text-indigo-700">{topic.title}</h2>
+                                        <p className="text-sm text-slate-500 mt-1">{topic.description}</p>
+                                    </div>
+                                </button>
+                            ))}
                         </div>
                     </div>
                 );
             }
 
-            return (
-                <div className="fade-in max-w-2xl mx-auto p-4 pt-8">
-                    <div className="flex justify-between items-center mb-6 text-sm font-bold text-slate-400">
-                        <span>QUESTION {currentQ + 1} OF {module.questions.length}</span>
-                        <span>{module.title}</span>
-                    </div>
+            if (view === 'learn' && activeTopic) {
+                return (
+                    <div className="min-h-screen bg-white">
+                        <div className="max-w-3xl mx-auto p-4 md:p-8">
+                            <button onClick={() => setView('home')} className="flex items-center text-slate-500 hover:text-indigo-600 font-medium mb-6 transition-colors">
+                                <ChevronLeft size={20} className="mr-1" /> Back to Dashboard
+                            </button>
 
-                    <div className="bg-white p-8 rounded-2xl shadow-lg border border-slate-100 mb-6">
-                        <h3 className="text-xl font-bold text-slate-800 mb-6 leading-relaxed">
-                            {question.question}
-                        </h3>
-
-                        <div className="space-y-3">
-                            {question.options.map((opt, idx) => (
-                                <button
-                                    key={idx}
-                                    onClick={() => !isChecking && setSelected(idx)}
-                                    disabled={isChecking}
-                                    className={`w-full text-left p-4 rounded-xl border-2 transition-all flex justify-between items-center
-                                        ${isChecking && idx === question.correct ? 'border-emerald-500 bg-emerald-50 text-emerald-900' : ''}
-                                        ${isChecking && idx === selected && idx !== question.correct ? 'border-red-500 bg-red-50 text-red-900' : ''}
-                                        ${!isChecking && selected === idx ? 'border-indigo-500 bg-indigo-50 text-indigo-900' : 'border-slate-100 hover:border-indigo-200 hover:bg-slate-50'}
-                                    `}
-                                >
-                                    <span>{opt}</span>
-                                    {isChecking && idx === question.correct && <span className="text-emerald-600">✓</span>}
-                                    {isChecking && idx === selected && idx !== question.correct && <span className="text-red-600">✕</span>}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    {feedback && (
-                        <div className={`fade-in p-6 rounded-xl mb-6 ${feedback.type === 'success' ? 'bg-emerald-100 text-emerald-900' : 'bg-red-100 text-red-900'}`}>
-                            <p className="font-bold mb-1">{feedback.type === 'success' ? 'Excellent!' : 'Review:'}</p>
-                            <p className="text-sm opacity-90">{feedback.text}</p>
-                        </div>
-                    )}
-
-                    {!isChecking ? (
-                        <button 
-                            onClick={handleCheck}
-                            disabled={selected === null}
-                            className="w-full bg-indigo-600 text-white py-4 rounded-xl font-bold hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md"
-                        >
-                            Check Answer
-                        </button>
-                    ) : (
-                        <button 
-                            onClick={handleNext}
-                            className="w-full bg-slate-900 text-white py-4 rounded-xl font-bold hover:bg-slate-800 transition-all shadow-md"
-                        >
-                            {currentQ < module.questions.length - 1 ? 'Next Question →' : 'View Results'}
-                        </button>
-                    )}
-                </div>
-            );
-        };
-
-        const App = () => {
-            const [view, setView] = useState('home'); // home, learn, practice
-            const [activeModuleIdx, setActiveModuleIdx] = useState(0);
-            const [score, setScore] = useState(0);
-            const [streak, setStreak] = useState(0);
-
-            const handleModuleSelect = (idx) => {
-                setActiveModuleIdx(idx);
-                setView('learn');
-            };
-
-            const handleScore = (isCorrect) => {
-                if (isCorrect) {
-                    setScore(s => s + 100 + (streak * 10));
-                    setStreak(s => s + 1);
-                } else {
-                    setStreak(0);
-                }
-            };
-
-            return (
-                <div className="min-h-screen bg-slate-50 font-sans text-slate-900 pb-12">
-                    {/* Navigation Bar */}
-                    <nav className="bg-white border-b border-slate-200 sticky top-0 z-10">
-                        <div className="max-w-4xl mx-auto px-4 h-16 flex items-center justify-between">
-                            <div className="font-black text-indigo-600 text-xl tracking-tight cursor-pointer" onClick={() => setView('home')}>
-                                StudyMastery
-                            </div>
-                            {view !== 'home' && (
-                                <div className="text-xs font-bold bg-slate-100 px-3 py-1 rounded-full text-slate-500 uppercase">
-                                    {curriculum[activeModuleIdx].title}
+                            <div className="flex items-center gap-3 mb-6">
+                                <div className="p-2 bg-indigo-100 text-indigo-700 rounded-lg">
+                                    {activeTopic.icon}
                                 </div>
-                            )}
+                                <h1 className="text-3xl font-bold text-slate-900">{activeTopic.title}</h1>
+                            </div>
+
+                            <div className="prose prose-slate max-w-none mb-10 fade-in">
+                                {activeTopic.theory}
+                            </div>
+
+                            <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-slate-200 flex justify-center shadow-lg">
+                                <button 
+                                    onClick={handleStartPractice}
+                                    className="bg-indigo-600 text-white px-8 py-3 rounded-full font-bold text-lg shadow-indigo-200 shadow-xl hover:bg-indigo-700 transform hover:-translate-y-1 transition-all flex items-center gap-2"
+                                >
+                                    Start Practice <ArrowRight size={20} />
+                                </button>
+                            </div>
+                            <div className="h-20"></div> {/* Spacer for fixed bottom bar */}
                         </div>
-                    </nav>
+                    </div>
+                );
+            }
 
-                    {view === 'home' && (
-                        <HomeView 
-                            onSelectModule={handleModuleSelect} 
-                            score={score}
-                            streak={streak}
-                        />
-                    )}
+            if (view === 'practice' && activeTopic) {
+                const question = activeTopic.questions[currentQuestionIdx];
+                const progress = ((currentQuestionIdx) / activeTopic.questions.length) * 100;
 
-                    {view === 'learn' && (
-                        <LearnView 
-                            module={curriculum[activeModuleIdx]} 
-                            onNext={() => setView('practice')}
-                        />
-                    )}
+                return (
+                    <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
+                        <div className="w-full max-w-2xl">
+                            {/* Header Stats */}
+                            <div className="flex justify-between items-center mb-6 px-2">
+                                <button onClick={() => setView('home')} className="text-slate-400 hover:text-slate-600 transition-colors">
+                                    <XCircle size={24} />
+                                </button>
+                                <div className="flex gap-4 font-bold">
+                                    <span className="text-orange-500 flex items-center gap-1">
+                                        🔥 {streak}
+                                    </span>
+                                    <span className="text-indigo-600">
+                                        {score} pts
+                                    </span>
+                                </div>
+                            </div>
 
-                    {view === 'practice' && (
-                        <PracticeView 
-                            module={curriculum[activeModuleIdx]} 
-                            updateScore={handleScore}
-                            goHome={() => setView('home')}
-                        />
-                    )}
-                </div>
-            );
-        };
+                            {/* Progress Bar */}
+                            <div className="h-2 bg-slate-200 rounded-full mb-8 overflow-hidden">
+                                <div className="h-full bg-indigo-500 transition-all duration-500" style={{ width: `${progress}%` }}></div>
+                            </div>
+
+                            {/* Question Card */}
+                            <div className="bg-white rounded-2xl shadow-lg border border-slate-200 p-6 md:p-10 fade-in relative overflow-hidden">
+                                <div className="mb-6">
+                                    <span className="text-xs font-bold tracking-wider text-slate-400 uppercase mb-2 block">Question {currentQuestionIdx + 1} of {activeTopic.questions.length}</span>
+                                    <h2 className="text-xl md:text-2xl font-bold text-slate-800 leading-snug">
+                                        {question.question}
+                                    </h2>
+                                </div>
+
+                                <div className="grid gap-3">
+                                    {question.options.map((opt, idx) => (
+                                        <button
+                                            key={idx}
+                                            onClick={() => handleAnswer(idx)}
+                                            disabled={!!feedback}
+                                            className={`w-full p-4 rounded-xl border-2 font-medium text-left transition-all
+                                                ${feedback 
+                                                    ? idx === question.correctIndex 
+                                                        ? 'border-green-500 bg-green-50 text-green-700' 
+                                                        : feedback.type === 'incorrect' && idx === activeTopic.questions[currentQuestionIdx].options.indexOf(opt) // simplified logic for demo
+                                                            ? 'opacity-50' 
+                                                            : 'border-slate-100 text-slate-400'
+                                                    : 'border-slate-100 hover:border-indigo-200 hover:bg-indigo-50 text-slate-600'
+                                                }
+                                            `}
+                                        >
+                                            {opt}
+                                        </button>
+                                    ))}
+                                </div>
+
+                                {/* Feedback Overlay */}
+                                {feedback && (
+                                    <div className={`mt-6 p-4 rounded-xl border ${feedback.type === 'correct' ? 'bg-green-50 border-green-200 text-green-800' : 'bg-red-50 border-red-200 text-red-800'} fade-in`}>
+                                        <div className="flex items-start gap-3">
+                                            <div className="mt-1">
+                                                {feedback.type === 'correct' ? <CheckCircle size={20} /> : <XCircle size={20} />}
+                                            </div>
+                                            <div>
+                                                <p className="font-bold">{feedback.type === 'correct' ? 'Nice work!' : 'Keep trying!'}</p>
+                                                <p className="text-sm mt-1 opacity-90">{feedback.text}</p>
+                                            </div>
+                                        </div>
+                                        <button 
+                                            onClick={nextQuestion}
+                                            className={`mt-4 w-full py-3 rounded-lg font-bold text-white transition-colors ${feedback.type === 'correct' ? 'bg-green-600 hover:bg-green-700' : 'bg-red-600 hover:bg-red-700'}`}
+                                        >
+                                            {currentQuestionIdx === activeTopic.questions.length - 1 ? 'See Results' : 'Next Question'}
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            if (view === 'results') {
+                const maxScore = activeTopic.questions.length * 10;
+                const percentage = Math.round((score / maxScore) * 100);
+                
+                return (
+                    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+                        <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full text-center fade-in">
+                            <div className="w-24 h-24 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6 text-6xl">
+                                {percentage >= 80 ? '🏆' : percentage >= 60 ? '🌟' : '📚'}
+                            </div>
+                            
+                            <h2 className="text-3xl font-black text-slate-900 mb-2">{percentage >= 80 ? 'Mastery Achieved!' : 'Good Effort!'}</h2>
+                            <p className="text-slate-500 mb-6">You scored {score} out of {maxScore} points.</p>
+                            
+                            <div className="flex gap-3">
+                                <button 
+                                    onClick={() => setView('home')}
+                                    className="flex-1 py-3 rounded-xl border border-slate-200 font-bold text-slate-600 hover:bg-slate-50 transition-colors"
+                                >
+                                    Menu
+                                </button>
+                                <button 
+                                    onClick={handleStartPractice}
+                                    className="flex-1 py-3 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-700 transition-colors"
+                                >
+                                    Retry
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                );
+            }
+
+            return null;
+        }
 
         const root = ReactDOM.createRoot(document.getElementById('root'));
         root.render(<App />);
